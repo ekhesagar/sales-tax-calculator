@@ -8,8 +8,8 @@ class App extends React.Component{
     super(props)
     this.state = {
       count: 0,
-      type: String('regular'),
-      product: String('book'),
+      type: '',
+      product: '',
       price: 0,
       items: [],
       totalTax: 0,
@@ -32,6 +32,7 @@ handleSubmit(e) {
   let total, totalTax
   let price = this.state.price*this.state.count;
   let product = this.state.product;
+
   if(this.state.type === 'imported'){
     if(taxExempted.includes(product)) price = price+ price*(0.05)
     else price = price + price*(0.15)
@@ -39,16 +40,31 @@ handleSubmit(e) {
 
   total = this.state.total + price;
   totalTax = (price - this.state.price) + this.state.totalTax;
+
   let item = {
-    count: this.state.count,
+    count: Number(this.state.count),
     type: this.state.type,
     product: this.state.product,
-    totalPrice: price,
-    price: this.state.price
+    totalPrice: Number(price),
+    price: Number(this.state.price)
   }
+
+  let check = false;
+  let items = this.state.items;
+
+  items = items.map((element) => {
+    if(element.product === this.state.product && element.type === this.state.type){
+      element.count = element.count + Number(this.state.count);
+      element.totalPrice += Number(price);
+      check = true;
+      return element;
+    }
+    return element;
+  })
+
   this.setState( prev => ({
     ...prev,
-    items: [...this.state.items, item],
+    items: check ? items : [...this.state.items, item],
     total: total,
     totalTax: totalTax
   }))
